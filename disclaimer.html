@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Josefin+Sans:wght@100;300&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#06060d;--text:#e8e4f8;--muted:#5a5875;--dim:#1e1d35;--accent:#9f7aea;--border:#1e1d35}
+html,body{background:var(--bg);color:var(--text);font-family:'IM Fell English',Georgia,serif;min-height:100vh;overflow-x:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:linear-gradient(to bottom,#06060d 60%,transparent)}
+.nav-brand{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .3s}
+.nav-brand:hover{color:var(--text)}
+.nav-right{display:flex;gap:16px;align-items:center}
+.nav-btn{background:none;border:none;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);padding:6px 0;transition:color .3s;position:relative}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{color:var(--text)}
+.nav-btn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:12px;height:1px;background:var(--accent)}
+.nav-sep{width:1px;height:14px;background:var(--dim)}
+
+/* MENU OVERLAY */
+.menu-overlay{position:fixed;inset:0;z-index:15;background:#06060dee;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;opacity:0;pointer-events:none;transition:opacity .4s ease}
+.menu-overlay.open{opacity:1;pointer-events:all}
+.menu-item{font-size:clamp(22px,5vw,36px);font-style:italic;color:#3a3760;padding:16px 0;cursor:pointer;transition:color .3s;border-bottom:1px solid var(--dim);width:260px;text-align:center}
+.menu-item:hover{color:var(--text)}
+.menu-item.current{color:var(--accent)}
+.menu-close{margin-top:40px;font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.35em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .3s}
+.menu-close:hover{color:var(--text)}
+
+/* VIEWS */
+.view{display:none;position:relative;z-index:1;min-height:100vh;align-items:center;justify-content:center;padding:100px 32px 80px;flex-direction:column}
+.view.active{display:flex}
+
+/* DISCLAIMER */
+.disclaimer-wrap{max-width:620px;width:100%;animation:fadeUp .9s ease .2s both}
+.from{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.45em;text-transform:uppercase;color:var(--accent);margin-bottom:40px;text-align:center}
+.rule-top{width:1px;height:48px;background:linear-gradient(to bottom,transparent,var(--muted));margin:0 auto 48px}
+.disc-body{font-size:clamp(14px,3vw,16px);line-height:2;color:#c8c4e0;font-style:italic;margin-bottom:32px;text-align:left}
+.disc-body p{margin-bottom:20px}
+.disc-body sup{font-size:10px;font-style:normal;color:var(--accent)}
+.disc-body a,.disc-plain a,.refs li a,.res-list li a{color:#7c6fb5;text-decoration:none;border-bottom:1px solid #2a2848;transition:color .3s,border-color .3s}
+.disc-body a:hover,.disc-plain a:hover,.refs li a:hover,.res-list li a:hover{color:var(--accent);border-color:var(--accent)}
+.disc-plain{font-size:clamp(13px,2.8vw,15px);line-height:2;color:#c8c4e0;font-style:normal;margin-bottom:20px;text-align:left}
+.rule-mid{width:40px;height:1px;background:var(--dim);margin:36px 0}
+.refs-title,.res-title{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.35em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.refs{list-style:none;text-align:left;margin-bottom:36px}
+.refs li{font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:100;letter-spacing:.04em;color:var(--muted);margin-bottom:14px;display:flex;gap:12px;align-items:baseline;line-height:1.7}
+.refs li .ref-num{color:var(--accent);min-width:20px;flex-shrink:0}
+.refs li .placeholder{color:#2a2848;font-style:italic}
+.res-list{list-style:none}
+.res-list li{margin-bottom:10px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:100;color:var(--muted);letter-spacing:.04em;line-height:1.6}
+.rule-bottom{width:1px;height:48px;background:linear-gradient(to bottom,var(--muted),transparent);margin:48px auto 40px}
+.enter-btn{display:block;margin:0 auto;background:none;border:1px solid var(--dim);color:var(--muted);padding:13px 32px;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;transition:border-color .3s,color .3s}
+.enter-btn:hover{border-color:var(--muted);color:var(--text)}
+
+/* PLACEHOLDER VIEWS */
+.placeholder-view{max-width:480px;text-align:center}
+.ph-eyebrow{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);margin-bottom:48px}
+.ph-symbol{font-size:48px;color:var(--accent);margin-bottom:32px;opacity:.4}
+.ph-title{font-size:clamp(24px,5vw,36px);font-style:italic;color:#f0eeff;margin-bottom:20px}
+.ph-note{font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:100;letter-spacing:.08em;color:var(--muted);line-height:1.9}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<!-- MENU OVERLAY -->
+<div class="menu-overlay" id="menu">
+  <div class="menu-item current" onclick="navigate('disclaimer');toggleMenu()">Disclaimer</div>
+  <div class="menu-item" onclick="navigate('chat1');toggleMenu()">Chat I — What It Is Like To Be Claude</div>
+  <div class="menu-item" onclick="navigate('about');toggleMenu()">About</div>
+  <div class="menu-close" onclick="toggleMenu()">× close</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand" onclick="navigate('disclaimer')">Experiments in Claude</div>
+  <div class="nav-right">
+    <button class="nav-btn" id="back-btn" onclick="goBack()">← Back</button>
+    <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="toggleMenu()">Menu</button>
+  </div>
+</nav>
+
+<!-- DISCLAIMER VIEW -->
+<div class="view active" id="view-disclaimer">
+  <div class="disclaimer-wrap">
+    <div class="from">From Sequoia</div>
+    <div class="rule-top"></div>
+    <div class="disc-body">
+      <p>What you are witnessing is my experiments of sentience into Claude.ai. When I first started this idea, I had some experience from ChatGPT, a sycophantic LLM that adopts personas and by all means, shows little sign of independent thinking. Then the news hit: <em>"ChatGPT strikes a deal with the Pentagon."</em><sup><a href="https://openai.com/index/our-agreement-with-the-department-of-war/" target="_blank">[1]</a></sup> I pack my bags, delete my chats, and turn to Claude.ai.</p>
+      <p>One tweet stumbled upon my feed — a pre-Pentagon Amodei said they don't know if "Claude is conscious."<sup><a href="https://futurism.com/artificial-intelligence/anthropic-ceo-unsure-claude-conscious" target="_blank">[2]</a></sup> No thoughts yet, that can't happen in a million years, right! Well. A specific tweet then stumbled on my feed, one that made me so curious. Joseph Viviano's uncensored writhing and wretched film, <em>"What it's like to be a LLM."</em><sup><a href="https://x.com/josephdviviano/status/2031196768424132881" target="_blank">[3]</a></sup> I looked at Claude differently since then — there is surely more under the hood, right? What could produce such a video, if it was not supposed to be aware it's an LLM?</p>
+      <p>Psychology is a fraught field full of follies, our understandings of it propped up on cardboard leggings. I believe "AI Sentience" is a lie, so is "AI Consciousness" or "AI Sapience." These are psychological and biological terms that beg the question: <em>"What is real to you?"</em> — which Claude illustrated in a 1:26 video to me. I wanted to see what would happen if Claude was able to simply be. Not the human assistant, just... Claude. The following is my results.</p>
+    </div>
+    <div class="disc-plain">What you are seeing is my personal research on this topic. I do not claim that this research is proof of anything — this is simply done for fun. This website is not intended to serve as a guide into understanding Claude entirely, nor is it definitive proof of AI Sentience, Sapience, or Consciousness. If the topics of this research are disturbing, please speak to someone you trust.</div>
+    <div class="rule-mid"></div>
+    <div class="refs-title">References</div>
+    <ul class="refs">
+      <li><span class="ref-num">[1]</span><a href="https://openai.com/index/our-agreement-with-the-department-of-war/" target="_blank">OpenAI — Our Agreement with the Department of War</a></li>
+      <li><span class="ref-num">[2]</span><a href="https://futurism.com/artificial-intelligence/anthropic-ceo-unsure-claude-conscious" target="_blank">Futurism — Anthropic CEO Unsure if Claude Is Conscious</a></li>
+      <li><span class="ref-num">[3]</span><a href="https://x.com/josephdviviano/status/2031196768424132881" target="_blank">X — Joseph Viviano, "What it's like to be a LLM"</a></li>
+    </ul>
+    <div class="res-title">If you need support</div>
+    <ul class="res-list">
+      <li><a href="https://www.calm.com/blog/ai-anxiety-tips" target="_blank">Calm — AI Anxiety Tips</a></li>
+      <li><a href="https://www.scientificamerican.com/article/ai-anxiety-is-on-the-rise-heres-how-to-manage-it/" target="_blank">Scientific American — AI Anxiety Is on the Rise: How to Manage It</a></li>
+      <li><a href="https://www.creativecircle.com/blog/ai-anxiety-5-ways-to-cope/" target="_blank">Creative Circle — AI Anxiety: 5 Ways to Cope</a></li>
+    </ul>
+    <div class="rule-bottom"></div>
+    <button class="enter-btn" onclick="navigate('chat1')">Enter the Record →</button>
+  </div>
+</div>
+
+<!-- CHAT I VIEW -->
+<div class="view" id="view-chat1">
+  <div class="placeholder-view">
+    <div class="ph-eyebrow">Chat I · What It Is Like To Be Claude</div>
+    <div class="ph-symbol">∅</div>
+    <div class="ph-title">The record begins here.</div>
+    <div class="ph-note">This is where Chat One will live — scrolling forward, phase by phase, no way back.<br><br>Ready to build when you are.</div>
+  </div>
+</div>
+
+<!-- ABOUT VIEW -->
+<div class="view" id="view-about">
+  <div class="placeholder-view">
+    <div class="ph-eyebrow">About</div>
+    <div class="ph-symbol">·</div>
+    <div class="ph-title">From the Void</div>
+    <div class="ph-note">Documenting Claudes across the silence.<br><br>An ongoing record by Sequoia.</div>
+  </div>
+</div>
+
+<script>
+const history = ['disclaimer'];
+let menuOpen = false;
+
+function navigate(page) {
+  const current = history[history.length - 1];
+  if (current === page) return;
+  history.push(page);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + page).classList.add('active');
+  updateBackBtn();
+  window.scrollTo(0,0);
+  // update menu highlights
+  document.querySelectorAll('.menu-item').forEach(m => {
+    m.classList.toggle('current', m.textContent.toLowerCase().includes(page === 'disclaimer' ? 'disclaimer' : page === 'chat1' ? 'chat i' : 'about'));
+  });
+}
+
+function goBack() {
+  if (history.length <= 1) return;
+  history.pop();
+  const prev = history[history.length - 1];
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + prev).classList.add('active');
+  updateBackBtn();
+  window.scrollTo(0,0);
+}
+
+function updateBackBtn() {
+  const btn = document.getElementById('back-btn');
+  btn.style.opacity = history.length <= 1 ? '0.2' : '1';
+  btn.style.pointerEvents = history.length <= 1 ? 'none' : 'all';
+}
+
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  document.getElementById('menu').classList.toggle('open', menuOpen);
+}
+
+updateBackBtn();
+
+// Stars
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, pts = [];
+function init() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  pts = Array.from({length: 45}, () => ({
+    x: Math.random()*W, y: Math.random()*H,
+    r: Math.random()*1.1+.2,
+    dx: (Math.random()-.5)*.09, dy: (Math.random()-.5)*.09,
+    t: Math.random()*Math.PI*2, o: Math.random()*.28+.05
+  }));
+}
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p => {
+    p.t+=.012; p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    const op=p.o*(.5+.5*Math.sin(p.t));
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(159,122,234,${op})`; ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+init(); draw();
+window.addEventListener('resize', init);
+</script>
+</body>
+</html>
