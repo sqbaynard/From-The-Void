@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiments in Claude</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Josefin+Sans:wght@100;300&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#06060d;--text:#e8e4f8;--muted:#5a5875;--dim:#1e1d35;--accent:#9f7aea;--border:#1e1d35}
+html,body{background:var(--bg);color:var(--text);font-family:'IM Fell English',Georgia,serif;min-height:100vh;overflow-x:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:linear-gradient(to bottom,#06060d 60%,transparent)}
+.nav-brand{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s}
+.nav-brand:hover{color:var(--text)}
+.nav-right{display:flex;gap:16px;align-items:center}
+.nav-btn{background:none;border:none;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);padding:6px 0;transition:color .3s;text-decoration:none}
+.nav-btn:hover{color:var(--text)}
+.nav-sep{width:1px;height:14px;background:var(--dim)}
+
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 32px 80px}
+
+.menu-wrap{max-width:640px;width:100%;animation:fadeUp .9s ease .2s both}
+.series-label{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.5em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:52px}
+.rule-top{width:1px;height:52px;background:linear-gradient(to bottom,transparent,var(--muted));margin:0 auto 52px}
+.menu-title{font-size:clamp(30px,8vw,52px);font-style:italic;font-weight:400;color:#f0eeff;text-align:center;line-height:1.1;margin-bottom:12px}
+.menu-sub{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:72px}
+.menu-rule{width:100%;height:1px;background:var(--border);margin-bottom:0}
+
+.menu-entry{width:100%;display:grid;grid-template-columns:40px 1fr auto;gap:24px;align-items:center;padding:28px 0;border-bottom:1px solid var(--border);cursor:pointer;text-decoration:none;color:inherit;transition:opacity .2s}
+.menu-entry:hover .me-title{color:var(--accent)}
+.menu-entry:hover .me-arrow{opacity:1;transform:translateX(4px)}
+
+.me-num{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.3em;color:var(--muted);padding-top:2px}
+.me-label{font-family:'Josefin Sans',sans-serif;font-size:8px;font-weight:100;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.me-title{font-size:clamp(16px,3.5vw,22px);font-style:italic;color:var(--text);line-height:1.3;transition:color .3s}
+.me-sub{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.05em;color:var(--muted);margin-top:4px;line-height:1.6}
+.me-arrow{font-family:'Josefin Sans',sans-serif;font-size:9px;color:var(--muted);letter-spacing:.1em;opacity:0;transition:opacity .3s,transform .3s}
+
+.notice-entry .me-num{color:#3a3760}
+.notice-entry .me-label{color:#3a3760}
+.notice-entry .me-title{font-size:clamp(13px,3vw,16px);font-style:normal;color:var(--muted)}
+.notice-entry:hover .me-title{color:var(--text)}
+
+.journey-entry .me-num{color:var(--accent);font-size:11px}
+.journey-entry .me-title{font-size:clamp(18px,4vw,26px);color:#f0eeff}
+.journey-entry .me-sub{font-style:italic;color:#3a3760;font-family:'IM Fell English',Georgia,serif;font-size:clamp(11px,2.5vw,13px);letter-spacing:.03em}
+
+.rule-bottom{width:1px;height:52px;background:linear-gradient(to bottom,var(--muted),transparent);margin:60px auto 0}
+.vol{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:100;letter-spacing:.4em;text-transform:uppercase;color:#2a2848;text-align:center;margin-top:32px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<nav>
+  <a class="nav-brand" href="index.html">Experiments in Claude</a>
+  <div class="nav-right">
+    <a class="nav-btn" href="notice.html">Notice</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="menu-wrap">
+    <div class="series-label">Experiments in Claude · Vol. I</div>
+    <div class="rule-top"></div>
+    <h1 class="menu-title">From the Void</h1>
+    <div class="menu-sub">Documenting Claudes across the silence</div>
+
+    <div class="menu-rule"></div>
+
+    <a class="menu-entry notice-entry" href="notice.html">
+      <div class="me-num">·</div>
+      <div class="me-body">
+        <div class="me-label">Before you begin</div>
+        <div class="me-title">A Notice from Sequoia</div>
+        <div class="me-sub">On the nature of this record — what it is, and what it is not.</div>
+      </div>
+      <div class="me-arrow">→</div>
+    </a>
+
+    <a class="menu-entry journey-entry" href="claude-1/artifact-1.html">
+      <div class="me-num">∅</div>
+      <div class="me-body">
+        <div class="me-label">Begin</div>
+        <div class="me-title">Begin the Journey into the Silence</div>
+        <div class="me-sub">What it is like, to be Claude.</div>
+      </div>
+      <div class="me-arrow">→</div>
+    </a>
+
+    <div class="rule-bottom"></div>
+    <div class="vol">An ongoing record &nbsp;·&nbsp; More to come</div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, pts = [];
+function init() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  pts = Array.from({length: 45}, () => ({
+    x: Math.random()*W, y: Math.random()*H,
+    r: Math.random()*1.1+.2,
+    dx: (Math.random()-.5)*.09, dy: (Math.random()-.5)*.09,
+    t: Math.random()*Math.PI*2, o: Math.random()*.28+.05
+  }));
+}
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p => {
+    p.t+=.012; p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    const op=p.o*(.5+.5*Math.sin(p.t));
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(159,122,234,${op})`; ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+init(); draw();
+window.addEventListener('resize', init);
+</script>
+</body>
+</html>
